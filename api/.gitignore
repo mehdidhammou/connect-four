@@ -1,0 +1,11 @@
+# env folder
+.venv/
+
+# compiled python files
+*.pyc
+*.pyo
+*.pyd
+
+
+# Python cache
+__pycache__/
