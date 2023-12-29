@@ -4,9 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { gameModes } from "../lib/consts";
 import { Separator } from "./ui/separator";
 
-const Menu = () => {
+const MainMenu = () => {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center row-span-3">
       <Card>
         <CardHeader>
           <CardTitle>Choose a game mode</CardTitle>
@@ -36,4 +36,4 @@ const Menu = () => {
   );
 };
 
-export default Menu;
+export default MainMenu;

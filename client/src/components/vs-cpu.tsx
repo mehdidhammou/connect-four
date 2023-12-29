@@ -4,7 +4,7 @@ import { restart } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
-import Board from "./Board";
+import Board from "./board";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader } from "./ui/card";
 import {
@@ -12,7 +12,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "./ui/dialog";
 import { Separator } from "./ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
@@ -37,7 +37,7 @@ const VsCpu = ({ whichCpu }: VsCpuProps) => {
   };
 
   return (
-    <div className="w-full row-span-2">
+    <div className="w-full row-span-3">
       <Card>
         <CardHeader>
           <div className="grid grid-cols-4">
@@ -69,13 +69,20 @@ const VsCpu = ({ whichCpu }: VsCpuProps) => {
                 </ToggleGroup>
                 <Separator />
                 <DialogFooter>
-                  <Button
-                    className="w-full"
-                    disabled={!selectedStarter}
-                    onClick={handleStartClick}
-                  >
-                    Start
-                  </Button>
+                  <div className="flex flex-col w-full gap-2">
+                    <Button
+                      disabled={!selectedStarter}
+                      onClick={handleStartClick}
+                    >
+                      Start
+                    </Button>
+                    <Button asChild variant={'outline'}>
+                      <Link to={"/"}>
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        {"Main menu"}
+                      </Link>
+                    </Button>
+                  </div>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
