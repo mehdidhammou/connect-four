@@ -1,113 +1,111 @@
 // VsCpu.js
-
+import { Player } from "@/lib/types";
+import { restart } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import Board from "./Board";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader } from "./ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle
+} from "./ui/dialog";
+import { Separator } from "./ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 
-const VsCpu = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isRestartMenuOpen, setIsRestartMenuOpen] = useState(true);
-  const [selectedStarter, setSelectedStarter] = useState(null);
-  let whoStarts = null;
+type VsCpuProps = {
+  whichCpu: 1 | 2;
+};
 
-  const handleOptionClick = (option) => {
-    // setSelectedStarter(option);
-    whoStarts = option;
-    const buttons = document.querySelectorAll(".restart-menu button");
-    console.log(buttons);
-    for (let i = 0; i < buttons.length - 2; i++) {
-      buttons[i].classList.remove("inactive");
-      if (buttons[i].innerHTML != option) {
-        buttons[i].classList.add("inactive");
-      }
-    }
-  };
+const VsCpu = ({ whichCpu }: VsCpuProps) => {
+  const [selectedStarter, setSelectedStarter] = useState<Player>();
+
+  const [currentPlayer, setCurrentPlayer] = useState<Player>();
 
   const handleStartClick = () => {
-    if (whoStarts) {
-      setIsRestartMenuOpen(false);
-      setSelectedStarter(whoStarts);
-    } else {
-      return alert("Please select who starts first!");
-    }
+    setCurrentPlayer(selectedStarter);
   };
 
-  const [turn, setTurn] = useState("Player");
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-  };
-
-  const handleMainMenu = () => {
-    setIsRestartMenuOpen(false);
-    setIsMenuOpen(true);
-  };
-
-  const changeMode = () => {
-    setIsMenuOpen(!isMenuOpen);
-    setIsRestartMenuOpen(true);
-    // window.location.href = "/cpu-vs-cpu"
-  };
-
-  const restart = () => {
-    window.location.reload();
+  const toggleTurn = () => {
+    setCurrentPlayer((currentPlayer) =>
+      currentPlayer === "CPU" ? "Human" : "CPU"
+    );
   };
 
   return (
-    <div className="main-connect4">
-      <h1>Connect Four</h1>
-      <div className="submenu">
-        <button onClick={toggleMenu}>Menu</button>
-        <h3 className="turn">{turn}'s turn</h3>
-        <button className="restart" onClick={restart}>
-          Restart
-        </button>
-      </div>
-      {selectedStarter && (
-        <Board
-          setTurn={setTurn}
-          selectedStarter={selectedStarter}
-          whichCpu={1}
-        />
-      )}
+    <div className="w-full row-span-2">
+      <Card>
+        <CardHeader>
+          <div className="grid grid-cols-4">
+            <Button asChild variant={"ghost"} className="mr-2" size={"icon"}>
+              <Link to={"/"}>
+                <ArrowLeft />
+              </Link>
+            </Button>
 
-      {isRestartMenuOpen && (
-        <div className="modal">
-          <div className="restart-menu menu-content">
-            <h2>Who starts first? </h2>
-            <button onClick={() => handleOptionClick("Player")}>Player</button>
-            <button onClick={() => handleOptionClick("CPU")}>CPU</button>
-            <button className="greenBtn" onClick={handleStartClick}>
-              Start
-            </button>
-            <button className="redBtn" onClick={handleMainMenu}>
-              Main Menu
-            </button>
-          </div>
-        </div>
-      )}
+            <Dialog open={!currentPlayer}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Who starts first?</DialogTitle>
+                </DialogHeader>
+                <ToggleGroup
+                  variant={"outline"}
+                  value={selectedStarter}
+                  onValueChange={(value: Player) => setSelectedStarter(value)}
+                  type="single"
+                  size={"lg"}
+                  className="grid grid-cols-2"
+                >
+                  <ToggleGroupItem variant={"outline"} value="Human">
+                    Human
+                  </ToggleGroupItem>
+                  <ToggleGroupItem variant={"outline"} value="CPU">
+                    CPU
+                  </ToggleGroupItem>
+                </ToggleGroup>
+                <Separator />
+                <DialogFooter>
+                  <Button
+                    className="w-full"
+                    disabled={!selectedStarter}
+                    onClick={handleStartClick}
+                  >
+                    Start
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
-      {/* Modal */}
-      {isMenuOpen && (
-        <div className="modal">
-          <div className="menu-content">
-            <button onClick={restart}>Restart</button>
-            <Link onClick={changeMode} className="link" to={"/vs-cpu2"}>
-              {"Player vs CPU (positions)"}
-            </Link>
-            <Link onClick={changeMode} className="link" to={"/cpu-vs-cpu"}>
-              {"CPU vs CPU"}
-            </Link>
-            <button className="redBtn" onClick={closeMenu}>
-              Close
-            </button>
+            <div className="grid col-span-2 place-items-center">
+              <h3 className="text-xl font-semibold">{currentPlayer}'s turn</h3>
+            </div>
+
+            <div className="flex">
+              <Button
+                className="ml-auto"
+                variant={"destructive"}
+                onClick={restart}
+              >
+                Restart
+              </Button>
+            </div>
           </div>
-        </div>
-      )}
+        </CardHeader>
+        <Separator />
+        <CardContent className="p-6">
+          {currentPlayer && (
+            <Board
+              toggleTurn={toggleTurn}
+              selectedStarter={selectedStarter}
+              whichCpu={whichCpu}
+            />
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

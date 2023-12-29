@@ -46,7 +46,7 @@ class Play:
         return row, col, 2
 
     def minimaxAlphaBetaPruning(
-        self, board, depth, alpha, beta, heuristic, maximizingPlayer
+        self, board : ConnectFourBoard, depth, alpha, beta, heuristic, maximizingPlayer
     ):
         if depth == 0 or board.gameOver():
             if heuristic == 1:

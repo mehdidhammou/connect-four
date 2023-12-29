@@ -1,31 +1,23 @@
+import { Piece } from "@/lib/types";
 import Cell from "./Cell";
 
-const Column = ({ colum, onClick, disabled }) => {
-  const initialBoardState = [
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0],
-  ];
+type ColumnProps = {
+  column: Piece[];
+  onClick: (column: Piece[]) => Promise<void>;
+  disabled: boolean;
+};
 
-  function transpose(matrix) {
-    return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
-  }
-
-  const transposedBoardState = transpose(initialBoardState);
-
+const Column = ({ column, onClick, disabled }: ColumnProps) => {
   return (
-    <div
-      onClick={() => onClick(colum)}
-      className={disabled ? "column disabled" : "column"}
+    <button
+      disabled={disabled}
+      onClick={() => onClick(column)}
+      className="flex flex-col gap-2 p-2 transition rounded-full disabled:opacity-50 hover:bg-blue-100"
     >
-      {/* Render the cells within the column */}
-      {colum.map((value, index) => (
+      {column.map((value, index) => (
         <Cell key={index} value={value} />
       ))}
-    </div>
+    </button>
   );
 };
 

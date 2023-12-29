@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 from classes.Play import Play
 from flask_cors import CORS
-
+from enum import Enum
 
 app = Flask(__name__)
 CORS(app)
@@ -9,6 +9,13 @@ CORS(app)
 # Initialize Connect Four game
 game = Play()
 board = game.board
+
+
+class MakeMoveResponseMessage(Enum):
+    WIN = "You win!"
+    LOSE = "You lose!"
+    TIE = "Tie!"
+    CONTINUE = "Game continues"
 
 
 @app.route("/")
@@ -97,20 +104,19 @@ def make_move():
 
     # Check game status after the bot's move
     result = game.board.gameOver()
+    message = MakeMoveResponseMessage.CONTINUE
     if result:
         if game.board.win(1):
-            return jsonify({"success": True, "message": "You win!"})
+            message = MakeMoveResponseMessage.WIN
         elif game.board.win(2):
-            return jsonify(
-                {"success": True, "message": "You lose!", "board": game.board.board}
-            )
+            message = MakeMoveResponseMessage.LOSE
         else:
-            return jsonify({"success": True, "message": "Tie!"})
+            message = MakeMoveResponseMessage.TIE
 
     return jsonify(
         {
             "success": True,
-            "message": "Game continues",
+            "message": message.value,
             "row": row,
             "col": col,
             "piece": piece,
