@@ -1,4 +1,4 @@
-import { boardShape } from "@/lib/consts";
+// import { boardShape } from "@/lib/consts";
 import { MakeMoveResponse, Piece, Player } from "@/lib/types";
 import { createEmptyBoard, restart, transpose } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -16,8 +16,14 @@ const Board = ({ whichCpu, toggleTurn, selectedStarter }: BoardProps) => {
   const [canIChoose, setCanIChoose] = useState(true);
 
   useEffect(() => {
-    if (selectedStarter === "CPU") {
-      const col = Math.floor(Math.random() * boardShape.cols);
+    let col = null;
+    if (selectedStarter === "CPU" && whichCpu === 1) {
+      col = 0; // the heuristic always starts from the left
+    } else if (selectedStarter === "CPU" && whichCpu === 2) {
+      col = 3; // the heuristic always starts from the middle
+    }
+
+    if (col !== null) {
       setBoard(makeMove(board, col, 2).newBoard);
     }
   }, []);

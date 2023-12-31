@@ -15,16 +15,16 @@ def main():
     # randomMove = random.choice(board.getPossibleMoves())1
 
     # print(randomMove)
-    game.computerTurn2()
+    game.computerTurn()
     board.drawBoard()
     while not board.gameOver():
         game.humanTurn()
-        print(board.heuristicEval2(1))
+        print(board.heuristicEval(1))
         board.drawBoard()
         if board.gameOver():
             break
-        game.computerTurn2()
-        print(board.heuristicEval2(2))
+        game.computerTurn()
+        print(board.heuristicEval(2))
         board.drawBoard()
     # game.humanTurn()
     # board.drawBoard()
