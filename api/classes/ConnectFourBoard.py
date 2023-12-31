@@ -92,6 +92,11 @@ class ConnectFourBoard:
     # def countConnectedPieces(self, piece):
 
     def heuristicEval(self, piece):
+        if self.win(piece):
+            return 999999
+        if self.win(3 - piece):
+            return -999999
+ 
         score = 0
 
         # Evaluate based on consecutive pieces in rows
@@ -119,18 +124,17 @@ class ConnectFourBoard:
                 score += self.evaluateWindow(window, piece)
 
         return score
-
     def evaluateWindow(self, window, piece):
         opponent_piece = 3 - piece
 
         if window.count(piece) == 4:
-            return 1000000  # Strongly encourage winning moves
+            return 10000  # Strongly encourage winning moves
         elif window.count(piece) == 3 and window.count(0) == 1:
             return 10  # Encourage completing a winning sequence
         elif window.count(piece) == 2 and window.count(0) == 2:
             return 5  # Encourage creating opportunities
-        elif window.count(opponent_piece) == 4 and window.count(0) == 0:
-            return -100000  # Discourage opponent from winning
+        elif window.count(opponent_piece) == 3 and window.count(0) == 1:
+            return -10000  # block opponent from winning
         else:
             return 0
 
