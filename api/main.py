@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, request
-from classes.Play import Play
+from classes.play import Play
+from classes.response import Response
+from classes.move import Move
 from flask_cors import CORS
 from enum import Enum
 
@@ -10,119 +12,100 @@ CORS(app)
 game = Play()
 board = game.board
 
+res_messages = {
+    "win": "You win!",
+    "lose": "You lose!",
+    "tie": "Tie!",
+    "continue": "Game continues",
+    "mm_pos_win": "Minimax positions wins!",
+    "mm_piece_win": "Minimax pieces wins!",
+}
 
-class MakeMoveResponseMessage(Enum):
-    WIN = "You win!"
-    LOSE = "You lose!"
-    TIE = "Tie!"
-    CONTINUE = "Game continues"
+players = {
+    "human": 1,
+    "cpu": 2,
+}
 
 
 @app.route("/")
-# def index():
-#     return "Welcome to Connect Four!"
-# define a function where the board is returned as a JSON object
 def index():
     return jsonify(board.board)
 
 
-@app.route("/get_move", methods=["POST"])
 # define a function where it takes the board and the cpu (1 or 2) and return the new board after the move by the cpu
+@app.route("/get_move", methods=["POST"])
 def get_move():
     data = request.get_json()
-    cpu = data.get("cpu")
-    currentBoard = data.get("board")
+    heuristic: int = data.get("heuristic")
+    currentBoard: list[list[int]] = data.get("board")
 
     game.board.board = currentBoard
 
-    if cpu == 1:  # if the cpu is 1, then it is the MM pieces
-        row, col, piece = game.computerTurn(cpu)
-    else:  # if the cpu is 2, then it is the MM positions
-        row, col, piece = game.computerTurn2(cpu)
+    best_move = game.computerTurn(heuristic=heuristic)
 
-    # Check game status after the bot's move
-    result = game.board.gameOver()
-    if result:
-        if game.board.win(1):
-            return jsonify({"success": True, "message": "MM pieces win!"})
-        elif game.board.win(2):
-            return jsonify(
-                {
-                    "success": True,
-                    "message": "MM positions win!",
-                    "board": game.board.board,
-                }
-            )
-        else:
-            return jsonify({"success": True, "message": "Tie!"})
+    print(game.board.getPossibleMoves())
+    print(best_move)
+    game.board.makeMove(best_move, piece=heuristic)
 
-    return jsonify(
-        {
-            "success": True,
-            "message": "Game continues",
-            "row": row,
-            "col": col,
-            "piece": piece,
-            "board": game.board.board,
-        }
+    response = Response(
+        board=game.board.board,
+        message=res_messages["continue"],
     )
+    # Check game status after the bot's move
+    if result := game.board.win(1):
+        response.message = res_messages["mm_piece_win"]
+        response.sequence = result
+    elif result := game.board.win(2):
+        response.message = res_messages["mm_pos_win"]
+        response.sequence = result
+    elif not game.board.getPossibleMoves():
+        response.message = res_messages["tie"]
+
+    return jsonify(response.__dict__)
 
 
 @app.route("/make_move", methods=["POST"])
 def make_move():
     data = request.get_json()
-    cpu = data.get("cpu")
-    row = data.get("row")
-    col = data.get("col")
-    piece = data.get("piece")
-    currentBoard = data.get("board")
+    heuristic: int = data.get("heuristic")
+    row: int = data.get("row")
+    col: int = data.get("col")
+    piece: int = data.get("piece")
+    currentBoard: list[list[int]] = data.get("board")
 
     game.board.board = currentBoard
-    # # Make a move
-    game.board.makeMove(row, col, piece)
 
-    # if not success:
-    #     return jsonify({'error': 'Invalid move'}), 400
+    # # Make a move
+    game.board.makeMove({"col": col, "row": row}, piece)
+
+    response = Response(
+        board=game.board.board,
+        message=res_messages["continue"],
+    )
 
     # Check game status after the move
-    result = game.board.gameOver()
+    result = game.board.win(1)
     if result:
-        if game.board.win(1):
-            return jsonify({"success": True, "message": "You win!"})
-        elif game.board.win(2):
-            return jsonify(
-                {"success": True, "message": "You lose!", "board": game.board.board}
-            )
-        else:
-            return jsonify({"success": True, "message": "Tie!"})
+        response.sequence = result
+        response.message = res_messages["win"]
+    elif not game.board.getPossibleMoves():
+        response.message = res_messages["tie"]
+        return jsonify(response.__dict__)
 
     # Let the bot make its move
-    if cpu == 1:
-        row, col, piece = game.computerTurn()
-    else:
-        row, col, piece = game.computerTurn2()
+    best_move = game.computerTurn(heuristic=heuristic)
+    print(best_move)
+    game.board.makeMove(best_move, 2)
 
-    # Check game status after the bot's move
-    result = game.board.gameOver()
-    message = MakeMoveResponseMessage.CONTINUE
+    response.board = game.board.board
+    result = game.board.win(2)
     if result:
-        if game.board.win(1):
-            message = MakeMoveResponseMessage.WIN
-        elif game.board.win(2):
-            message = MakeMoveResponseMessage.LOSE
-        else:
-            message = MakeMoveResponseMessage.TIE
+        response.sequence = result
+        response.message = res_messages["lose"]
+    elif not game.board.getPossibleMoves():
+        response.message = res_messages["tie"]
 
-    return jsonify(
-        {
-            "success": True,
-            "message": message.value,
-            "row": row,
-            "col": col,
-            "piece": piece,
-            "board": game.board.board,
-        }
-    )
+    return jsonify(response.__dict__)
 
 
 if __name__ == "__main__":

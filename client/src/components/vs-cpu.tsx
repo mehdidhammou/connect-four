@@ -1,5 +1,5 @@
 // VsCpu.js
-import { Player } from "@/lib/types";
+import { Heuristic, Player } from "@/lib/types";
 import { restart } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
@@ -18,10 +18,10 @@ import { Separator } from "./ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 
 type VsCpuProps = {
-  whichCpu: 1 | 2;
+  heuristic: Heuristic;
 };
 
-const VsCpu = ({ whichCpu }: VsCpuProps) => {
+const VsCpu = ({ heuristic }: VsCpuProps) => {
   const [selectedStarter, setSelectedStarter] = useState<Player>();
 
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
@@ -76,7 +76,7 @@ const VsCpu = ({ whichCpu }: VsCpuProps) => {
                     >
                       Start
                     </Button>
-                    <Button asChild variant={'outline'}>
+                    <Button asChild variant={"outline"}>
                       <Link to={"/"}>
                         <ArrowLeft className="w-4 h-4 mr-2" />
                         {"Main menu"}
@@ -108,7 +108,7 @@ const VsCpu = ({ whichCpu }: VsCpuProps) => {
             <Board
               toggleTurn={toggleTurn}
               selectedStarter={selectedStarter}
-              whichCpu={whichCpu}
+              heuristic={heuristic}
             />
           )}
         </CardContent>

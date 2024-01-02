@@ -1,57 +1,78 @@
 // import { boardShape } from "@/lib/consts";
-import { MakeMoveResponse, Piece, Player } from "@/lib/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Heuristic,
+  MakeMoveResponse,
+  Move,
+  Piece,
+  Player,
+  ResponseMessage,
+} from "@/lib/types";
 import { createEmptyBoard, restart, transpose } from "@/lib/utils";
+import { AlertCircle, Check } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "../ui/button";
+import { Separator } from "../ui/separator";
 import Column from "./column";
+import { PIECE } from "@/lib/consts";
 
 type BoardProps = {
-  whichCpu: 1 | 2;
+  heuristic: Heuristic;
   toggleTurn: () => void;
   selectedStarter: Player | undefined;
 };
 
-const Board = ({ whichCpu, toggleTurn, selectedStarter }: BoardProps) => {
+const Board = ({ heuristic, toggleTurn, selectedStarter }: BoardProps) => {
   const [board, setBoard] = useState(createEmptyBoard());
-
+  const [gameOver, setGameOver] = useState(false);
+  const [message, setMessage] = useState<ResponseMessage>("Game continues");
+  const [sequence, setSequence] = useState<Move[]>([]);
   const [canIChoose, setCanIChoose] = useState(true);
 
   useEffect(() => {
-    let col = null;
-    if (selectedStarter === "CPU" && whichCpu === 1) {
-      col = 0; // the heuristic always starts from the left
-    } else if (selectedStarter === "CPU" && whichCpu === 2) {
-      col = 3; // the heuristic always starts from the middle
+    if (selectedStarter === "CPU") {
+      if (heuristic === 1) {
+        makeMove(0, PIECE.Cpu);
+      } else if (heuristic === 2) {
+        makeMove(3, PIECE.Cpu);
+      }
+      toggleTurn();
     }
 
-    if (col !== null) {
-      setBoard(makeMove(board, col, 2).newBoard);
-    }
+    return () => toggleTurn();
   }, []);
 
-  const makeMove = (
-    board: Piece[][],
-    colIdx: number,
-    piece: Piece
-  ): { newBoard: Piece[][]; cell: number } => {
+  const makeMove = (colIdx: number, piece: Piece): number => {
     const testBoard = transpose(board);
 
-    if (testBoard[colIdx].every((cell) => cell !== 0))
-      return { newBoard: board, cell: -1 };
+    // if the column is full, return -1
+    if (testBoard[colIdx].every((cell) => cell !== 0)) return -1;
 
+    // find the first empty cell in the column
+    const row = testBoard[colIdx].lastIndexOf(PIECE.Empty);
 
-    const cell = testBoard[colIdx].lastIndexOf(0);
+    testBoard[colIdx][row] = piece;
+    setBoard(transpose(testBoard));
 
-    testBoard[colIdx][cell] = piece;
-
-    toggleTurn();
-
-    return { newBoard: transpose(testBoard), cell };
+    return row;
   };
 
   const handleColumnClick = async (col: number) => {
-    const { newBoard, cell } = makeMove(board, col, 1);
+    if (gameOver) return;
+
+    const row = makeMove(col, PIECE.Player);
+
+    // cpu's turn
+    toggleTurn();
+
     setCanIChoose(false);
-    setBoard(newBoard);
+
     try {
       // Post the player's move to the server
       const playerMoveResponse = await fetch(
@@ -62,8 +83,8 @@ const Board = ({ whichCpu, toggleTurn, selectedStarter }: BoardProps) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            cpu: whichCpu,
-            row: cell,
+            heuristic: heuristic,
+            row: row,
             col: col,
             piece: 1,
             board: board,
@@ -72,15 +93,21 @@ const Board = ({ whichCpu, toggleTurn, selectedStarter }: BoardProps) => {
       );
 
       const playerMoveData: MakeMoveResponse = await playerMoveResponse.json();
-      console.log("Player move data:", playerMoveData);
 
+      // @ts-expect-error ignore
       setBoard(playerMoveData.board);
 
+      // player's turn
       toggleTurn();
 
       if (playerMoveData.message != "Game continues") {
-        alert(playerMoveData.message);
-        restart();
+        if (playerMoveData.sequence) {
+          setSequence(playerMoveData.sequence);
+        }
+        // sleep for 1 second
+        await new Promise((r) => setTimeout(r, 1000));
+        setGameOver(true);
+        setMessage(playerMoveData.message);
       }
     } catch (error) {
       console.error("Error handling player move:", error);
@@ -90,18 +117,52 @@ const Board = ({ whichCpu, toggleTurn, selectedStarter }: BoardProps) => {
   };
 
   return (
-    <div className="flex items-center justify-center ">
-      {/* Render the columns */}
-      {transpose(board).map((col, index) => (
-        <Column
-          key={index}
-          colIdx={index}
-          column={col}
-          onClick={handleColumnClick}
-          disabled={!canIChoose || col.every((cell) => cell !== 0)}
-        />
-      ))}
-    </div>
+    <>
+      <div className="flex items-center justify-center ">
+        {transpose(board).map((col, index) => (
+          <Column
+            key={index}
+            colIdx={index}
+            sequence={sequence}
+            column={col}
+            onClick={handleColumnClick}
+            disabled={
+              !canIChoose || col.every((cell) => cell !== 0) || gameOver
+            }
+          />
+        ))}
+      </div>
+      {gameOver && (
+        <Dialog defaultOpen>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Game over</DialogTitle>
+            </DialogHeader>
+            {message === "You win!" ? (
+              <div className="flex flex-col items-center justify-center gap-4 p-8 bg-green-100 rounded-md">
+                <Check />
+                <p className="font-bold">{message}</p>
+              </div>
+            ) : message === "You lose!" ? (
+              <div className="flex flex-col items-center justify-center gap-4 p-8 bg-red-100 rounded-md">
+                <AlertCircle />
+                <p className="font-bold">{message}</p>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 p-8 bg-yellow-100 rounded-md">
+                <p className="font-bold">{message}</p>
+              </div>
+            )}
+            <Separator />
+            <DialogFooter>
+              <Button className="w-full" onClick={() => restart()}>
+                Restart
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 };
 

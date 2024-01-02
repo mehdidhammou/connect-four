@@ -1,3 +1,7 @@
+from classes.move import Move
+from math import inf
+
+
 class ConnectFourBoard:
     def __init__(self):
         self.rows = 6
@@ -5,98 +9,69 @@ class ConnectFourBoard:
         self.board = [[0] * self.cols for _ in range(self.rows)]
 
     def drawBoard(self):
+        print("Board:")
         for row in self.board:
             print("|", end=" ")
             for cell in row:
-                if cell == 0:
-                    print(" ", end=" ")
-                else:
-                    print(cell, end=" ")
-                print("|", end=" ")
+                print(" " if cell == 0 else cell, end=" | ")
             print("\n" + "-" * (self.cols * 4 + 1))
 
-    def getPossibleMoves(self):
-        moves = []
+    def getPossibleMoves(self) -> list[Move]:
+        moves: list[Move] = []
         for col in range(self.cols):
             for row in range(self.rows - 1, -1, -1):
                 if self.board[row][col] == 0:
-                    moves.append((row, col))
+                    moves.append({"col": col, "row": row})
                     break
         return moves
 
-    def makeMove(self, row, col, piece):
-        if (row, col) in self.getPossibleMoves():
-            self.board[row][col] = piece
+    def makeMove(self, move: Move, piece: int):
+        if move in self.getPossibleMoves():
+            self.board[move["row"]][move["col"]] = piece
         else:
-            # print("Invalid move")
-            pass
+            raise Exception("Invalid move")
 
-    def win(self, piece):
+    def win(self, piece: int) -> list[Move] | None:
         # Check for horizontal wins
+
         for row in range(self.rows):
             for col in range(self.cols - 3):
-                if (
-                    self.board[row][col] == piece
-                    and self.board[row][col + 1] == piece
-                    and self.board[row][col + 2] == piece
-                    and self.board[row][col + 3] == piece
-                ):
-                    return True
+                sequence = self.board[row][col : col + 4]
+                if all(cell == piece for cell in sequence):
+                    return [{"row": row, "col": col + i} for i in range(4)]
 
         # Check for vertical wins
         for row in range(self.rows - 3):
             for col in range(self.cols):
-                if (
-                    self.board[row][col] == piece
-                    and self.board[row + 1][col] == piece
-                    and self.board[row + 2][col] == piece
-                    and self.board[row + 3][col] == piece
-                ):
-                    return True
+                sequence = [self.board[row + i][col] for i in range(4)]
+                if all(cell == piece for cell in sequence):
+                    return [{"row": row + i, "col": col} for i in range(4)]
 
         # Check for diagonal wins (bottom-left to top-right)
         for row in range(3, self.rows):
             for col in range(self.cols - 3):
-                if (
-                    self.board[row][col] == piece
-                    and self.board[row - 1][col + 1] == piece
-                    and self.board[row - 2][col + 2] == piece
-                    and self.board[row - 3][col + 3] == piece
-                ):
-                    return True
+                sequence = [self.board[row - i][col + i] for i in range(4)]
+                if all(cell == piece for cell in sequence):
+                    return [{"row": row - i, "col": col + i} for i in range(4)]
 
         # Check for diagonal wins (top-left to bottom-right)
         for row in range(self.rows - 3):
             for col in range(self.cols - 3):
-                if (
-                    self.board[row][col] == piece
-                    and self.board[row + 1][col + 1] == piece
-                    and self.board[row + 2][col + 2] == piece
-                    and self.board[row + 3][col + 3] == piece
-                ):
-                    return True
+                sequence = [self.board[row + i][col + i] for i in range(4)]
+                if all(cell == piece for cell in sequence):
+                    return [{"row": row + i, "col": col + i} for i in range(4)]
 
-        return False
+        return None
 
     def gameOver(self):
         return self.win(1) or self.win(2) or not self.getPossibleMoves()
 
-    def countPieces(self):
-        count = 0
-        for row in range(self.rows):
-            for col in range(self.cols):
-                if self.board[row][col] != 0:
-                    count += 1
-        return count
-
-    # def countConnectedPieces(self, piece):
-
     def heuristicEval(self, piece):
         if self.win(piece):
-            return 999999
+            return inf
         if self.win(3 - piece):
-            return -999999
- 
+            return -inf
+
         score = 0
 
         # Evaluate based on consecutive pieces in rows
@@ -124,6 +99,7 @@ class ConnectFourBoard:
                 score += self.evaluateWindow(window, piece)
 
         return score
+
     def evaluateWindow(self, window, piece):
         opponent_piece = 3 - piece
 

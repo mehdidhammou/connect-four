@@ -7,6 +7,11 @@ export const PIECE = {
     Cpu: 2,
 } as const;
 
+export const heuristicMap = {
+    1: "MM Pieces",
+    2: "MM Positions",
+} as const;
+
 export const gameModes: GameMode[] = [
     {
         "name": "Human vs CPU (Counting pieces)",

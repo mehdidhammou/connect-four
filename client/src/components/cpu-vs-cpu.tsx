@@ -1,218 +1,121 @@
-// // CpuVsCpu.js
+// VsCpu.js
+import { heuristicMap } from "@/lib/consts";
+import { Heuristic, HeuristicName } from "@/lib/types";
+import { restart } from "@/lib/utils";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import AutoBoard from "./auto-board";
+import { Button } from "./ui/button";
+import { Card, CardContent, CardHeader } from "./ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import { Separator } from "./ui/separator";
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 
-// import { useEffect, useState } from "react";
-// import { Link } from "react-router-dom"; // Import Link from react-router-dom
-// import Column from "./board/column";
-// const CpuVsCpu = () => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const [isRestartMenuOpen, setIsRestartMenuOpen] = useState(true);
-//   const [selectedStarter, setSelectedStarter] = useState(null);
-//   const [whichCpu, setWhichCpu] = useState(null);
+const CpuVsCpu = () => {
+  const [selectedStarter, setSelectedStarter] = useState<HeuristicName>();
+  const [dialogOpen, setDialogOpen] = useState(!selectedStarter);
 
-//   let whoStarts = null;
-//   const handleOptionClick = (option) => {
-//     whoStarts = option;
-//     const buttons = document.querySelectorAll(".restart-menu button");
-//     console.log(buttons);
-//     for (let i = 0; i < buttons.length - 2; i++) {
-//       buttons[i].classList.remove("inactive");
-//       if (buttons[i].innerHTML != option) {
-//         buttons[i].classList.add("inactive");
-//       }
-//     }
-//   };
+  const toggleTurn = () => {
+    setSelectedStarter((prev) =>
+      prev === "MM Pieces" ? "MM Positions" : "MM Pieces"
+    );
+  };
 
-//   const [turn, setTurn] = useState(null);
+  return (
+    <div className="w-full row-span-3">
+      <Card>
+        <CardHeader>
+          <div className="grid grid-cols-4">
+            <Button asChild variant={"ghost"} className="mr-2" size={"icon"}>
+              <Link to={"/"}>
+                <ArrowLeft />
+              </Link>
+            </Button>
 
-//   const changeTurn = (who) => {
-//     if (who == 1) {
-//       setTurn("MM pieces");
-//     } else {
-//       setTurn("MM positions");
-//     }
-//   };
-//   const handleStartClick = () => {
-//     if (whoStarts) {
-//       setIsRestartMenuOpen(false);
-//       setTurn(whoStarts);
-//       if (whoStarts === "MM positions") {
-//         setWhichCpu(2);
-//       } else {
-//         setWhichCpu(1);
-//       }
-//       setSelectedStarter(whoStarts);
-//     } else {
-//       return alert("Please select who starts first!");
-//     }
-//   };
+            <Dialog open={dialogOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Who starts first?</DialogTitle>
+                </DialogHeader>
+                <ToggleGroup
+                  variant={"outline"}
+                  value={selectedStarter}
+                  onValueChange={(value: HeuristicName) =>
+                    setSelectedStarter(value)
+                  }
+                  type="single"
+                  size={"lg"}
+                  className="grid grid-cols-2"
+                >
+                  {Object.values(heuristicMap).map((heuristicName) => (
+                    <ToggleGroupItem key={heuristicName} value={heuristicName}>
+                      {heuristicName}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+                <Separator />
+                <DialogFooter>
+                  <div className="flex flex-col w-full gap-2">
+                    <DialogClose
+                      onClick={() => setDialogOpen(false)}
+                      asChild
+                      disabled={!selectedStarter}
+                    >
+                      <Button>Start</Button>
+                    </DialogClose>
+                    <Button asChild variant={"outline"}>
+                      <Link to={"/"}>
+                        <ArrowLeft className="w-4 h-4 mr-2" />
+                        {"Main menu"}
+                      </Link>
+                    </Button>
+                  </div>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
-//   const toggleMenu = () => {
-//     setIsMenuOpen(!isMenuOpen);
-//   };
+            <div className="grid col-span-2 place-items-center">
+              <h3 className="text-xl font-semibold">
+                {selectedStarter}'s turn
+              </h3>
+            </div>
 
-//   const closeMenu = () => {
-//     setIsMenuOpen(false);
-//   };
+            <div className="flex">
+              <Button
+                className="ml-auto"
+                variant={"destructive"}
+                onClick={restart}
+              >
+                Restart
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+        <Separator />
+        <CardContent className="p-6">
+          {!dialogOpen && (
+            <AutoBoard
+              toggleTurn={toggleTurn}
+              starter={
+                Object.keys(heuristicMap).find(
+                  // @ts-expect-error ignore
+                  (key) => heuristicMap[key] === selectedStarter
+                ) as unknown as Heuristic
+              }
+            />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
-//   const handleMainMenu = () => {
-//     setIsRestartMenuOpen(false);
-//     setIsMenuOpen(true);
-//   };
-
-//   const changeMode = () => {
-//     setIsMenuOpen(!isMenuOpen);
-//     setIsRestartMenuOpen(true);
-//     // window.location.href = "/vs-cpu"
-//   };
-
-//   const restart = () => {
-//     window.location.reload();
-//   };
-
-//   console.log(selectedStarter);
-//   const initialBoardState = [
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0],
-//     [0, 0, 0, 0, 0, 0, 0],
-//   ];
-
-//   // fetch the initial board state from the server
-
-//   function transpose(matrix) {
-//     return matrix[0].map((_, colIndex) => matrix.map((row) => row[colIndex]));
-//   }
-
-//   const [board, setBoard] = useState(transpose(initialBoardState));
-//   const [canIChoose, setCanIChoose] = useState(true);
-
-//   const [intervalId, setIntervalId] = useState(null);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const untransposedBoard = transpose(board);
-//         console.log("the turn of the cpu ", whichCpu);
-
-//         const BotMoveResponse = await fetch("http://localhost:5000/get_move", {
-//           method: "POST",
-//           headers: {
-//             "Content-Type": "application/json",
-//           },
-//           body: JSON.stringify({
-//             cpu: whichCpu,
-//             board: untransposedBoard,
-//           }),
-//         });
-
-//         if (!BotMoveResponse.ok) {
-//           console.error("Failed to get bot move");
-//           return;
-//         }
-
-//         const BotMoveData = await BotMoveResponse.json();
-//         console.log("Bot move data:", BotMoveData);
-
-//         if (BotMoveData.message === "MM pieces win!") {
-//           setBoard(transpose(BotMoveData.board));
-//           clearInterval(intervalId); // Stop the interval when the game is over
-//           return alert("MM pieces win!");
-//         } else if (BotMoveData.message === "MM positions win!") {
-//           setBoard(transpose(BotMoveData.board));
-//           clearInterval(intervalId); // Stop the interval when the game is over
-//           return alert("MM positions win!");
-//         } else if (BotMoveData.message === "Tie!") {
-//           clearInterval(intervalId); // Stop the interval when the game is over
-//           return alert("Tie!");
-//         }
-//         setBoard(transpose(BotMoveData.board));
-//         setWhichCpu(3 - whichCpu);
-//         changeTurn(whichCpu);
-//       } catch (error) {
-//         console.error("Error handling bot move:", error);
-//         alert("Couldn't connect to the server");
-//       }
-//     };
-
-//     if (selectedStarter) {
-//       // Start the interval when the component mounts
-//       const id = setInterval(fetchData, 2000); // Adjust the interval as needed
-//       setIntervalId(id);
-
-//       // Clean up the interval when the component unmounts
-//       return () => clearInterval(id);
-//     }
-//   }, [board, selectedStarter, whichCpu]);
-
-//   return (
-//     <div className="main-connect4">
-//       <h1>Connect Four</h1>
-//       <div className="submenu">
-//         <button onClick={toggleMenu}>Menu</button>
-//         {/* {turn && <h3 className={`turn-${whichCpu}`}>{turn}'s turn</h3>} */}
-//         <h3 className="turn-1">MM pieces</h3>
-//         <h3 className="turn-2">MM postions</h3>
-//         <button className="restart" onClick={restart}>
-//           Restart
-//         </button>
-//       </div>
-//       {selectedStarter && (
-//         <div className="board">
-//           {/* Render the columns */}
-//           {board.map((col, index) => (
-//             <Column
-//               onClick={() => {
-//                 return;
-//               }}
-//               key={index}
-//               colum={col}
-//               disabled={true}
-//             />
-//           ))}
-//         </div>
-//       )}
-
-//       {isRestartMenuOpen && (
-//         <div className="modal">
-//           <div className="restart-menu menu-content">
-//             <h2>Who starts first? </h2>
-//             <button onClick={() => handleOptionClick("MM pieces")}>
-//               MM pieces
-//             </button>
-//             <button onClick={() => handleOptionClick("MM positions")}>
-//               MM positions
-//             </button>
-//             <button className="greenBtn" onClick={handleStartClick}>
-//               Start
-//             </button>
-//             <button className="redBtn" onClick={handleMainMenu}>
-//               Main Menu
-//             </button>
-//           </div>
-//         </div>
-//       )}
-
-//       {/* Modal */}
-//       {isMenuOpen && (
-//         <div className="modal">
-//           <div className="menu-content">
-//             <button onClick={restart}>Restart</button>
-//             <Link onClick={changeMode} className="link" to={"/vs-cpu"}>
-//               {"Player vs CPU (counting pieces)"}
-//             </Link>
-//             <Link onClick={changeMode} className="link" to={"/vs-cpu2"}>
-//               {"Player vs CPU (positions)"}
-//             </Link>
-//             <button className="redBtn" onClick={closeMenu}>
-//               Close
-//             </button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default CpuVsCpu;
+export default CpuVsCpu;

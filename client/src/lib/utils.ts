@@ -1,7 +1,7 @@
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { PIECE, boardShape } from "./consts";
 import { Piece } from "./types";
-import { boardShape } from "./consts";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -16,5 +16,8 @@ export function restart() {
 }
 
 export function createEmptyBoard(rows: number = boardShape.rows, cols: number = boardShape.cols): Piece[][] {
-  return Array(rows).fill(0).map(() => Array(cols).fill(0));
+  return Array(rows)
+    .fill(0)
+    .map(() => Array<Piece>(cols)
+      .fill(PIECE.Empty));
 }
