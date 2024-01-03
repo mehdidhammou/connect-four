@@ -15,7 +15,7 @@ def main():
     # randomMove = random.choice(board.getPossibleMoves())1
 
     # print(randomMove)
-    game.computerTurn()
+    # game.board.makeMove(game.computerTurn(),2)
     board.drawBoard()
     while not board.gameOver():
         game.humanTurn()
@@ -23,7 +23,8 @@ def main():
         board.drawBoard()
         if board.gameOver():
             break
-        game.computerTurn()
+        cpu_move = game.computerTurn()
+        game.board.makeMove(cpu_move, 2)
         print(board.heuristicEval(2))
         board.drawBoard()
     # game.humanTurn()

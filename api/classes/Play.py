@@ -12,10 +12,11 @@ class Play:
             try:
                 col = int(input("Enter your move (column 1-7): "))
                 col = col - 1
-                possible_moves = [move[1] for move in self.board.getPossibleMoves()]
-                if col in possible_moves:
-                    row = self.findLowestEmptyRow(col)
-                    self.board.makeMove(row, col, 1)
+                row = self.findLowestEmptyRow(col)
+                human_move = {"row": row, "col": col}
+                possible_moves = [move for move in self.board.getPossibleMoves()]
+                if human_move in possible_moves:
+                    self.board.makeMove(human_move, 1)
                     break
                 else:
                     print("Invalid move. Try again.")
@@ -56,9 +57,8 @@ class Play:
                 
                 newBoard = ConnectFourBoard()
                 newBoard.board = [row[:] for row in board.board]
-                row = self.findLowestEmptyRow(move["col"])
-                cpu_move = {"row": row, "col": move["col"]}
-                newBoard.makeMove(cpu_move, 2)
+                
+                newBoard.makeMove(move, 2)
 
                 eval, _ = self.minimaxAlphaBetaPruning(
                     newBoard, depth - 1, alpha, beta, heuristic, False
@@ -66,7 +66,7 @@ class Play:
                 
                 if eval > maxEval:
                     maxEval = eval
-                    bestMove = move  # Extract the column from the tuple
+                    bestMove = move  
                 
                 alpha = max(alpha, eval)
                 
@@ -81,9 +81,8 @@ class Play:
             for move in possibleMoves:
                 newBoard = ConnectFourBoard()
                 newBoard.board = [row[:] for row in board.board]
-                row = self.findLowestEmptyRow(move["col"])
-                cpu_move = {"row": row, "col": move["col"]}
-                newBoard.makeMove(cpu_move, 1)
+                
+                newBoard.makeMove(move, 1)
                 
                 eval, _ = self.minimaxAlphaBetaPruning(
                     newBoard, depth - 1, alpha, beta, heuristic, True
@@ -91,7 +90,7 @@ class Play:
                 
                 if eval < minEval:
                     minEval = eval
-                    bestMove = move  # Extract the column from the tuple
+                    bestMove = move  
                 beta = min(beta, eval)
                 if beta <= alpha:
                     break
