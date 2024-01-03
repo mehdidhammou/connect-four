@@ -29,7 +29,8 @@ class ConnectFourBoard:
         if move in self.getPossibleMoves():
             self.board[move["row"]][move["col"]] = piece
         else:
-            raise Exception("Invalid move")
+            # raise Exception("Invalid move")
+            pass
 
     def win(self, piece: int) -> list[Move] | None:
         # Check for horizontal wins

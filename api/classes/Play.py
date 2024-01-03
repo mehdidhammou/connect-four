@@ -22,11 +22,11 @@ class Play:
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
-    # def findLowestEmptyRow(self, col):
-    #     for row in range(self.board.rows - 1, -1, -1):
-    #         if self.board.board[row][col] == 0:
-    #             return row
-    #     return -1  # Column is full
+    def findLowestEmptyRow(self, col):
+        for row in range(self.board.rows - 1, -1, -1):
+            if self.board.board[row][col] == 0:
+                return row
+        return -1  # Column is full
 
     def computerTurn(self, heuristic=1) -> Move:
         _, move = self.minimaxAlphaBetaPruning(
@@ -56,8 +56,9 @@ class Play:
                 
                 newBoard = ConnectFourBoard()
                 newBoard.board = [row[:] for row in board.board]
-                
-                newBoard.makeMove(move, 2)
+                row = self.findLowestEmptyRow(move["col"])
+                cpu_move = {"row": row, "col": move["col"]}
+                newBoard.makeMove(cpu_move, 2)
 
                 eval, _ = self.minimaxAlphaBetaPruning(
                     newBoard, depth - 1, alpha, beta, heuristic, False
@@ -80,7 +81,9 @@ class Play:
             for move in possibleMoves:
                 newBoard = ConnectFourBoard()
                 newBoard.board = [row[:] for row in board.board]
-                newBoard.makeMove(move, 1)  # Extract the column from the tuple
+                row = self.findLowestEmptyRow(move["col"])
+                cpu_move = {"row": row, "col": move["col"]}
+                newBoard.makeMove(cpu_move, 1)
                 
                 eval, _ = self.minimaxAlphaBetaPruning(
                     newBoard, depth - 1, alpha, beta, heuristic, True

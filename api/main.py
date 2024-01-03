@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from classes.play import Play
+from classes.Play import Play
 from classes.response import Response
 from classes.move import Move
 from flask_cors import CORS
