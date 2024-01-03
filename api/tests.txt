@@ -1,0 +1,32 @@
+def evaluateWindow(self, window, piece):
+        opponent_piece = 3 - piece
+
+        if window.count(piece) == 3 and window.count(0) == 1:
+            return 10  # Encourage completing a winning sequence
+        elif window.count(piece) == 2 and window.count(0) == 2:
+            return 5  # Encourage creating opportunities
+        # elif window.count(opponent_piece) == 3 and window.count(0) == 1:
+        #     return -99999  # Block opponent from winning
+        else:
+            return 0
+
+depth = 4 :
+cpu to start from col 3: loss
+human to start : loss
+
+depth = 5 :
+cpu to start from col 3: loss
+human to start: loss
+
+depth = 6 :
+cpu to start from col 3: win
+human to start: loss
+
+depth = 4 :
+cpu to start from col 0: loss
+
+depth = 5 :
+cpu to start from col 0: loss
+
+depth = 6 :
+cpu to start from col 0: loss
