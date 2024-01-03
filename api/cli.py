@@ -23,7 +23,9 @@ def main():
         board.drawBoard()
         if board.gameOver():
             break
-        game.computerTurn()
+        cpumove = game.computerTurn()
+        print(cpumove)
+        game.board.makeMove(cpumove, 2)
         print(board.heuristicEval(2))
         board.drawBoard()
     # game.humanTurn()

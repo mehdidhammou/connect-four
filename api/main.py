@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from classes.play import Play
+from classes.Play import Play
 from classes.response import Response
 from classes.move import Move
 from flask_cors import CORS
@@ -95,6 +95,7 @@ def make_move():
     # Let the bot make its move
     best_move = game.computerTurn(heuristic=heuristic)
     print(best_move)
+    game.board.drawBoard()
     game.board.makeMove(best_move, 2)
 
     response.board = game.board.board

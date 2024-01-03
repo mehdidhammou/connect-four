@@ -29,7 +29,8 @@ class ConnectFourBoard:
         if move in self.getPossibleMoves():
             self.board[move["row"]][move["col"]] = piece
         else:
-            raise Exception("Invalid move")
+            # raise Exception("Invalid move")
+            pass
 
     def win(self, piece: int) -> list[Move] | None:
         # Check for horizontal wins
@@ -65,13 +66,18 @@ class ConnectFourBoard:
 
     def gameOver(self):
         return self.win(1) or self.win(2) or not self.getPossibleMoves()
-
+    
+    
     def heuristicEval(self, piece):
         if self.win(piece):
-            return inf
+            return 999999
         if self.win(3 - piece):
-            return -inf
+            return -999999
 
+        return self.evaluateBoard(piece) 
+
+        
+    def evaluateBoard(self, piece):
         score = 0
 
         # Evaluate based on consecutive pieces in rows
@@ -99,6 +105,7 @@ class ConnectFourBoard:
                 score += self.evaluateWindow(window, piece)
 
         return score
+
 
     def evaluateWindow(self, window, piece):
         opponent_piece = 3 - piece
