@@ -87,7 +87,7 @@ const AutoBoard = ({ toggleTurn, starter }: BoardProps) => {
     };
 
     if (!gameOver) {
-      id = setInterval(fetchAndUpdate, 1000);
+      id = setInterval(fetchAndUpdate, 1500);
     }
 
     return () => clearInterval(id);
