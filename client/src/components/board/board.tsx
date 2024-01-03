@@ -44,8 +44,9 @@ const Board = ({ heuristic, toggleTurn, selectedStarter }: BoardProps) => {
       }
       toggleTurn();
     }
-
-    return () => toggleTurn();
+    if (selectedStarter === "CPU") {
+      return () => toggleTurn();
+    }
   }, []);
 
   const makeMove = (colIdx: number, piece: Piece): number => {
