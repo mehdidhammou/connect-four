@@ -6,7 +6,7 @@ import { Separator } from "./ui/separator";
 
 const MainMenu = () => {
   return (
-    <div className="flex items-center justify-center row-span-3">
+    <div className="row-span-3">
       <Card>
         <CardHeader>
           <CardTitle>Choose a game mode</CardTitle>
