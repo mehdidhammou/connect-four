@@ -74,3 +74,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.column:hover .cell.hoverable{
+  background-color: rgb(248, 113, 113 , 0.5);
+}

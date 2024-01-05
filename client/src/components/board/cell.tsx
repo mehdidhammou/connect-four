@@ -2,9 +2,11 @@ import { Piece } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const Cell = ({
+  isBottom,
   value,
   highlight = false,
 }: {
+  isBottom: boolean;
   value: Piece;
   highlight: boolean;
 }) => {
@@ -13,9 +15,10 @@ const Cell = ({
   return (
     <div
       className={cn(
-        "w-16 h-16 rounded-full",
+        "cell w-16 h-16 rounded-full",
         colorClass,
-        highlight && "border-4 border-green-500"
+        highlight && "border-4 border-green-500",
+        isBottom && "hoverable"
       )}
     />
   );

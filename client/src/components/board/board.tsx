@@ -121,7 +121,10 @@ const Board = ({ heuristic, toggleTurn, selectedStarter }: BoardProps) => {
     <>
       <div className="flex items-center justify-center ">
         {transpose(board).map((col, index) => (
+          
           <Column
+            // find the bottom-most empty cell in the column
+            bottomEmptyCell={col.lastIndexOf(0)}
             key={index}
             colIdx={index}
             sequence={sequence}
