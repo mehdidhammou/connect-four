@@ -9,7 +9,7 @@ const Cell = ({
   highlight: boolean;
 }) => {
   const colorClass =
-    value === 1 ? "bg-red-400" : value === 2 ? "bg-yellow-400" : "bg-gray-400";
+    value === 1 ? "bg-red-400" : value === 2 ? "bg-yellow-400" : "bg-zinc-500";
   return (
     <div
       className={cn(

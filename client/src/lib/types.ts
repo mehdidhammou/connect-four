@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-import { PIECE, heuristicMap } from "./consts";
+import { PIECE } from "./consts";
 
 export type GameMode = {
     name: string,
@@ -8,17 +8,15 @@ export type GameMode = {
     Icon2: LucideIcon,
 };
 
-export type Player = "Human" | "CPU" | "MM Piecese" | "MM Positions";
+export type GameState = "CONTINUE" | "WIN" | "LOSE" | "TIE" | "MM_POS_WIN" | "MM_PIECE_WIN";
 
 export type ObjectValues<T> = T[keyof T];
 
 export type Piece = ObjectValues<typeof PIECE>;
 
-export type ResponseMessage = "You win!" | "You lose!" | "Tie!" | "Game continues" | "Minimax pieces wins!" | "Minimax positions wins!";
+export type Heuristic = "pieces" | "positions";
 
-export type Heuristic = keyof typeof heuristicMap;
-export type HeuristicName = (typeof heuristicMap)[Heuristic];
-
+export type Player = "Human" | "CPU" | Heuristic | undefined;
 
 export type Move = {
     row: number,
@@ -30,11 +28,10 @@ export type Cell = {
     highlight: boolean,
 }
 
-export type MakeMoveResponse = {
+export type GameResponse = {
     success: boolean,
-    message: ResponseMessage,
-    board: unknown[][],
-    sequence?: Move[]
+    board: Piece[][],
+    message: string,
+    state: GameState,
+    sequence: Move[],
 };
-
-export type GetMoveResponse = MakeMoveResponse

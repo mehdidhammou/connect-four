@@ -1,11 +1,9 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-// import CpuVsCpu from "./components/CpuVsCpu";
-import Menu from "./components/main-menu";
-import VsCpu from "./components/vs-cpu";
+import Game from "./components/game/game";
 import Header from "./components/header";
-import CpuVsCpu from "./components/cpu-vs-cpu";
-import { ThemeProvider } from "./components/theme-provider";
-
+import Menu from "./components/main-menu";
+import { ThemeProvider } from "./providers/theme-provider";
+import { AutoGame } from "./components/game";
 const App = () => {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
@@ -14,9 +12,8 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="/" element={<Menu />} />
-            <Route path="/vs-cpu" element={<VsCpu heuristic={1} />} />
-            <Route path="/vs-cpu-2" element={<VsCpu heuristic={2} />} />
-            <Route path="/cpu-vs-cpu" element={<CpuVsCpu />} />
+            <Route path="/vs-cpu/:heuristic" element={<Game />} />
+            <Route path="/cpu-vs-cpu" element={<AutoGame />} />
           </Routes>
         </Router>
       </div>

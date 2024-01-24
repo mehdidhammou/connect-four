@@ -1,65 +1,49 @@
+from classes import (
+    ConnectFourBoard,
+    Game,
+    HeuristicFactory,
+    MinimaxAlphaBetaPruningSolver,
+    Response,
+)
 from flask import Flask, jsonify, request
-from classes.Play import Play
-from classes.response import Response
-from classes.move import Move
 from flask_cors import CORS
-from enum import Enum
 
 app = Flask(__name__)
 CORS(app)
 
-# Initialize Connect Four game
-game = Play()
-board = game.board
-
-res_messages = {
-    "win": "You win!",
-    "lose": "You lose!",
-    "tie": "Tie!",
-    "continue": "Game continues",
-    "mm_pos_win": "Minimax positions wins!",
-    "mm_piece_win": "Minimax pieces wins!",
-}
-
-players = {
-    "human": 1,
-    "cpu": 2,
-}
-
 
 @app.route("/")
 def index():
-    return jsonify(board.board)
+    return jsonify(ConnectFourBoard().state)
 
 
 # define a function where it takes the board and the cpu (1 or 2) and return the new board after the move by the cpu
 @app.route("/get_move", methods=["POST"])
 def get_move():
     data = request.get_json()
-    heuristic: int = data.get("heuristic")
+    heuristic = data.get("heuristic")
     currentBoard: list[list[int]] = data.get("board")
 
-    game.board.board = currentBoard
+    heuristic = HeuristicFactory.create_heuristic(heuristic=heuristic)
+    solver = MinimaxAlphaBetaPruningSolver(heuristic=heuristic, depth=4)
+    board = ConnectFourBoard(initial_state=currentBoard)
 
-    best_move = game.computerTurn(heuristic=heuristic)
+    game = Game(
+        board=board,
+        solver=solver,
+        cpu_vs_cpu=True,
+    )
 
-    print(game.board.getPossibleMoves())
-    print(best_move)
-    game.board.makeMove(best_move, piece=heuristic)
+    print(heuristic.id)
+    game.play(piece=heuristic.id)
 
     response = Response(
-        board=game.board.board,
-        message=res_messages["continue"],
+        success=True,
+        board=game.board.state,
+        state=game.state.name,
+        message=game.state.value,
+        sequence=game.board.winning_sequence,
     )
-    # Check game status after the bot's move
-    if result := game.board.win(1):
-        response.message = res_messages["mm_piece_win"]
-        response.sequence = result
-    elif result := game.board.win(2):
-        response.message = res_messages["mm_pos_win"]
-        response.sequence = result
-    elif not game.board.getPossibleMoves():
-        response.message = res_messages["tie"]
 
     return jsonify(response.__dict__)
 
@@ -67,43 +51,37 @@ def get_move():
 @app.route("/make_move", methods=["POST"])
 def make_move():
     data = request.get_json()
-    heuristic: int = data.get("heuristic")
-    row: int = data.get("row")
-    col: int = data.get("col")
-    piece: int = data.get("piece")
+    heuristic = data.get("heuristic")
     currentBoard: list[list[int]] = data.get("board")
 
-    game.board.board = currentBoard
+    heuristic = HeuristicFactory.create_heuristic(heuristic=heuristic)
+    solver = MinimaxAlphaBetaPruningSolver(heuristic=heuristic, depth=4)
+    board = ConnectFourBoard(initial_state=currentBoard)
 
-    # # Make a move
-    game.board.makeMove({"col": col, "row": row}, piece)
-
-    response = Response(
-        board=game.board.board,
-        message=res_messages["continue"],
+    game = Game(
+        board=board,
+        solver=solver,
+        cpu_vs_cpu=False,
     )
 
-    # Check game status after the move
-    result = game.board.win(1)
-    if result:
-        response.sequence = result
-        response.message = res_messages["win"]
-    elif not game.board.getPossibleMoves():
-        response.message = res_messages["tie"]
+    response = Response(
+        success=True,
+        board=game.board.state,
+        state=game.state.name,
+        message=game.state.value,
+        sequence=game.board.winning_sequence,
+    )
+
+    if game.is_over():
         return jsonify(response.__dict__)
 
     # Let the bot make its move
-    best_move = game.computerTurn(heuristic=heuristic)
-    print(best_move)
-    game.board.makeMove(best_move, 2)
+    game.play(piece=2)
 
-    response.board = game.board.board
-    result = game.board.win(2)
-    if result:
-        response.sequence = result
-        response.message = res_messages["lose"]
-    elif not game.board.getPossibleMoves():
-        response.message = res_messages["tie"]
+    response.message = game.state.value
+    response.board = game.board.state
+    response.state = game.state.name
+    response.sequence = game.board.winning_sequence
 
     return jsonify(response.__dict__)
 

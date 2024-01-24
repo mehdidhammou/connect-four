@@ -1,32 +1,43 @@
-import { Move, Piece } from "@/lib/types";
+import { PIECE } from "@/lib/consts";
+import { Heuristic, Piece } from "@/lib/types";
+import { useBoardStore } from "@/stores/board-store";
+import { useGameStore } from "@/stores/game-store";
+import { useParams } from "react-router-dom";
 import Cell from "./cell";
 
 type ColumnProps = {
   column: Piece[];
   colIdx: number;
-  onClick: (column: number) => void;
-  disabled: boolean;
-  sequence: Move[];
 };
 
-const Column = ({
-  column,
-  colIdx,
-  onClick,
-  disabled,
-  sequence,
-}: ColumnProps) => {
+const Column = ({ column, colIdx }: ColumnProps) => {
+  const { makeMove, sync, sequence, isSyncing } = useBoardStore();
+  const { auto, gameState } = useGameStore();
+  const { heuristic } = useParams<{ heuristic: Heuristic }>();
+  const disabled =
+    isSyncing || column[0] !== PIECE.Empty || auto || gameState !== "CONTINUE";
+
+  const handleClick = async () => {
+    if (disabled) {
+      return;
+    }
+    console.log("clicked");
+    makeMove(colIdx, 1);
+    // @ts-expect-error common useParams type
+    await sync(heuristic);
+  };
+
   return (
     <button
       disabled={disabled}
-      onClick={() => onClick(colIdx)}
-      className="flex flex-col gap-2 p-2 transition rounded-full disabled:opacity-50 enabled:hover:bg-blue-100"
+      onClick={handleClick}
+      className="flex flex-col gap-2 p-2 transition rounded-full disabled:opacity-50 enabled:hover:dark:bg-primary enabled:hover:bg-muted"
     >
       {column.map((val, index) => (
         <Cell
           key={index}
           value={val}
-          highlight={sequence?.some(
+          highlight={sequence.some(
             (move) => move.col === colIdx && move.row === index
           )}
         />
