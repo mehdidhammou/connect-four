@@ -1,10 +1,11 @@
 from .heuristic import Heuristic
-from classes.board import ConnectFourBoard
+from ..board.connect_four_board import ConnectFourBoard
 
 
 class CountPiecesHeuristic(Heuristic):
     def __init__(self, id: int) -> None:
         super().__init__(id=id)
+
     @staticmethod
     def evaluate(board: ConnectFourBoard, piece) -> int:
         if board.has_won(piece=1):

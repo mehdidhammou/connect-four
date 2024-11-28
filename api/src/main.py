@@ -8,6 +8,7 @@ from classes import (
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
+# configure the app
 app = Flask(__name__)
 CORS(app)
 
@@ -15,6 +16,11 @@ CORS(app)
 @app.route("/")
 def index():
     return jsonify(ConnectFourBoard().state)
+
+
+@app.route("/ping", methods=["GET"])
+def ping():
+    return jsonify({"message": "pong"})
 
 
 # define a function where it takes the board and the cpu (1 or 2) and return the new board after the move by the cpu
@@ -84,7 +90,3 @@ def make_move():
     response.sequence = game.board.winning_sequence
 
     return jsonify(response.__dict__)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)

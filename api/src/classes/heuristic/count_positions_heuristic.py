@@ -1,5 +1,5 @@
 from .heuristic import Heuristic
-from classes.board import ConnectFourBoard
+from ..board.connect_four_board import ConnectFourBoard
 
 
 class CountPositionsHeuristic(Heuristic):

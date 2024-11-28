@@ -1,8 +1,9 @@
 from math import inf
 
-from classes.board import ConnectFourBoard
-from classes.move import Move
-from classes.heuristic import Heuristic
+from ..board import ConnectFourBoard
+from ..heuristic import Heuristic
+from ..move import Move
+
 from .solver import Solver
 
 

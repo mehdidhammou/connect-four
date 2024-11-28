@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
+import { gameModes } from "../lib/consts";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { gameModes } from "../lib/consts";
 import { Separator } from "./ui/separator";
-import { useGameStore } from "@/stores/game-store";
 
 const MainMenu = () => {
-  const setAuto = useGameStore((state) => state.setAuto);
   return (
     <div className="row-span-3">
       <Card>

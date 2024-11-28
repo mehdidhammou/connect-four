@@ -1,5 +1,5 @@
-from classes.board import ConnectFourBoard
-from classes.solver import Solver
+from ..board.connect_four_board import ConnectFourBoard
+from ..solver.solver import Solver
 from .game_state import GameState
 
 
@@ -30,7 +30,9 @@ class Game:
             self.state = GameState.TIE
 
     def reset(self):
-        self.board = ConnectFourBoard()
+        self.board.state = [
+            [0 for _ in range(self.board.cols)] for _ in range(self.board.rows)
+        ]
 
     def is_over(self):
         return self.state != GameState.CONTINUE

@@ -43,7 +43,7 @@ export const useBoardStore = create<boardState & boardActions>()((set, get) => (
         set({ isSyncing: true });
         try {
             const res = await fetch(
-                `http://localhost:5000/${useGameStore.getState().auto ? "get_move" : "make_move"}`,
+                `${import.meta.env.VITE_API_BASE_URL}/${useGameStore.getState().auto ? "get_move" : "make_move"}`,
                 {
                     method: "POST",
                     headers: {

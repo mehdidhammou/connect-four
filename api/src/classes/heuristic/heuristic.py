@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from classes.board import ConnectFourBoard
+from ..board.connect_four_board import ConnectFourBoard
 
 
 class Heuristic(ABC):

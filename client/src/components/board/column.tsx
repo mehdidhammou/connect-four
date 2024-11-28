@@ -21,7 +21,6 @@ const Column = ({ column, colIdx }: ColumnProps) => {
     if (disabled) {
       return;
     }
-    console.log("clicked");
     makeMove(colIdx, 1);
     // @ts-expect-error common useParams type
     await sync(heuristic);

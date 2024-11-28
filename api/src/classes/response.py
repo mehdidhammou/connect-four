@@ -1,5 +1,5 @@
-from classes.move import Move
-from classes.game import GameState
+from .move import Move
+from .game import GameState
 
 
 class Response:

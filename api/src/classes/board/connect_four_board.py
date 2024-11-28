@@ -1,4 +1,4 @@
-from classes.move import Move
+from ..move import Move
 
 
 class ConnectFourBoard:
@@ -73,4 +73,4 @@ class ConnectFourBoard:
                     ]
                     return True
 
-        return None
+        return False

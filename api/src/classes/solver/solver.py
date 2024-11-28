@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from classes.board import ConnectFourBoard
-from classes.move import Move
+from ..board import ConnectFourBoard
+from ..move import Move
+
 
 class Solver(ABC):
     @abstractmethod
