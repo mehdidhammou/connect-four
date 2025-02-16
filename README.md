@@ -32,6 +32,10 @@ Open the frontend in a web browser at `http://localhost:8000` and simply follow 
 
 The objective of the game is to connect four of your own discs in a row, either horizontally, vertically, or diagonally, before your opponent does.
 
+## License
+
+This project is licensed under the MIT License.
+
 ## Contributing
 
 Contributions are welcome! Please feel free to open issues or pull requests for bug fixes, improvements, or additional features.
