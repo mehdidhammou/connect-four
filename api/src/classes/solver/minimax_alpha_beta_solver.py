@@ -23,7 +23,12 @@ class MinimaxAlphaBetaPruningSolver(Solver):
         return move
 
     def minimax_alpha_beta_pruning(
-        self, board: ConnectFourBoard, depth, alpha, beta, max_player
+        self,
+        board: ConnectFourBoard,
+        depth,
+        alpha,
+        beta,
+        max_player,
     ) -> tuple[int, Move]:
         if depth == 0 or not board.get_possible_moves():
             return self.heuristic.evaluate(board=board, piece=2), None

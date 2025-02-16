@@ -23,7 +23,6 @@ def ping():
     return jsonify({"message": "pong"})
 
 
-# define a function where it takes the board and the cpu (1 or 2) and return the new board after the move by the cpu
 @app.route("/get_move", methods=["POST"])
 def get_move():
     data = request.get_json()
