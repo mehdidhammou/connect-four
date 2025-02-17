@@ -23,11 +23,6 @@ export type Move = {
     col: number,
 };
 
-export type Cell = {
-    value: Piece,
-    highlight: boolean,
-}
-
 export type GameResponse = {
     success: boolean,
     board: Piece[][],
