@@ -33,44 +33,28 @@ class ConnectFourBoard:
         return moves
 
     def has_won(self, piece: int) -> bool:
-        # Check for horizontal wins
+        directions = [
+            (0, 1),
+            (1, 0),
+            (1, 1),
+            (-1, 1),
+        ]  # Right, Down, Diagonal ↘, Diagonal ↗
+
         for row in range(self.rows):
-            for col in range(self.cols - 3):
-                sequence = self.state[row][col : col + 4]
-                if all(cell == piece for cell in sequence):
-                    self.winning_sequence = [
-                        {"row": row, "col": col + i} for i in range(4)
-                    ]
-                    return True
-
-        # Check for vertical wins
-        for row in range(self.rows - 3):
             for col in range(self.cols):
-                sequence = [self.state[row + i][col] for i in range(4)]
-                if all(cell == piece for cell in sequence):
-                    self.winning_sequence = [
-                        {"row": row + i, "col": col} for i in range(4)
-                    ]
-                    return True
+                if self.state[row][col] != piece:
+                    continue
 
-        # Check for diagonal wins (bottom-left to top-right)
-        for row in range(3, self.rows):
-            for col in range(self.cols - 3):
-                sequence = [self.state[row - i][col + i] for i in range(4)]
-                if all(cell == piece for cell in sequence):
-                    self.winning_sequence = [
-                        {"row": row - i, "col": col + i} for i in range(4)
-                    ]
-                    return True
-
-        # Check for diagonal wins (top-left to bottom-right)
-        for row in range(self.rows - 3):
-            for col in range(self.cols - 3):
-                sequence = [self.state[row + i][col + i] for i in range(4)]
-                if all(cell == piece for cell in sequence):
-                    self.winning_sequence = [
-                        {"row": row + i, "col": col + i} for i in range(4)
-                    ]
-                    return True
+                for dr, dc in directions:
+                    if all(
+                        0 <= row + dr * i < self.rows
+                        and 0 <= col + dc * i < self.cols
+                        and self.state[row + dr * i][col + dc * i] == piece
+                        for i in range(4)
+                    ):
+                        self.winning_sequence = [
+                            {"row": row + dr * i, "col": col + dc * i} for i in range(4)
+                        ]
+                        return True
 
         return False
